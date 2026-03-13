@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ profile.name }} | Network Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Space+Grotesk:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#030B16;--dark:#060F1E;--panel:#091828;--panel2:#0C2038;
+  --cyan:#00D4FF;--cyan2:#0088BB;--green:#00FF88;--gold:#F5A623;
+  --red:#FF4444;--white:#E8F4FF;--muted:#4A6A88;
+  --border:rgba(0,212,255,0.13);--border2:rgba(0,212,255,0.05);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--navy);color:var(--white);font-family:'Space Grotesk',sans-serif;overflow-x:hidden;}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--navy);}
+::-webkit-scrollbar-thumb{background:var(--cyan2);border-radius:2px;}
+
+/* CANVAS */
+#bg-canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(3,11,22,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 56px;display:flex;align-items:center;justify-content:space-between;height:62px;}
+.nav-logo{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--cyan);}
+.nav-logo span{color:var(--white);}
+.nav-links{display:flex;gap:30px;list-style:none;}
+.nav-links a{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:1.2px;text-transform:uppercase;transition:color 0.2s;}
+.nav-links a:hover{color:var(--cyan);}
+.nav-right{display:flex;align-items:center;gap:16px;}
+.nav-status{display:flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--green);}
+.sdot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,255,136,0.5);}50%{box-shadow:0 0 0 7px rgba(0,255,136,0);}}
+
+/* SECTION */
+section{position:relative;z-index:1;}
+.wrap{max-width:1200px;margin:0 auto;padding:88px 56px;}
+.stag{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--cyan);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.stag::before{content:'//';color:var(--muted);}
+.stitle{font-family:'Syne',sans-serif;font-size:clamp(26px,3.5vw,44px);font-weight:800;color:#fff;margin-bottom:44px;line-height:1.1;}
+.stitle span{color:var(--cyan);}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(26px);transition:opacity 0.7s,transform 0.7s;}
+.rv.on{opacity:1;transform:translateY(0);}
+
+/* ══ HERO ══ */
+#hero{min-height:100vh;display:flex;align-items:center;padding:100px 56px 60px;}
+.hero-inner{max-width:1200px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 500px;gap:60px;align-items:center;}
+.hlabel{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--cyan);letter-spacing:3px;text-transform:uppercase;margin-bottom:14px;opacity:0;animation:fu .6s .2s forwards;}
+.hname{font-family:'Syne',sans-serif;font-size:clamp(36px,5vw,64px);font-weight:800;color:#fff;line-height:1.02;margin-bottom:8px;opacity:0;animation:fu .6s .35s forwards;}
+.hname .c{color:var(--cyan);}
+.hcmd{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--muted);margin-bottom:22px;opacity:0;animation:fu .6s .5s forwards;}
+.hcmd .g{color:var(--green);}
+.hdesc{font-size:14px;line-height:1.85;color:rgba(232,244,255,0.62);max-width:520px;margin-bottom:30px;opacity:0;animation:fu .6s .65s forwards;}
+.hbadges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:32px;opacity:0;animation:fu .6s .8s forwards;}
+.badge{font-family:'JetBrains Mono',monospace;font-size:9px;padding:4px 11px;border:1px solid var(--border);color:var(--cyan);background:rgba(0,212,255,0.05);}
+.hbtns{display:flex;gap:12px;opacity:0;animation:fu .6s .95s forwards;}
+.btn1{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:12px 26px;background:var(--cyan);color:var(--navy);text-decoration:none;border:none;cursor:pointer;transition:all .2s;}
+.btn1:hover{background:#fff;transform:translateY(-2px);}
+.btn2{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:11px 26px;background:transparent;color:var(--cyan);text-decoration:none;border:1px solid var(--cyan);cursor:pointer;transition:all .2s;}
+.btn2:hover{background:rgba(0,212,255,0.08);transform:translateY(-2px);}
+@keyframes fu{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+
+/* HERO TOPO */
+.hero-topo{position:relative;height:440px;opacity:0;animation:fi 1.2s .8s forwards;}
+@keyframes fi{from{opacity:0;}to{opacity:1;}}
+.topo-svg{width:100%;height:100%;}
+
+/* HERO STATS */
+.hstats{max-width:1200px;margin:36px auto 0;display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);opacity:0;animation:fu .6s 1.1s forwards;}
+.hstat{background:var(--panel);padding:18px 20px;text-align:center;}
+.hstat-n{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--cyan);line-height:1;margin-bottom:3px;}
+.hstat-l{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;}
+
+/* ══ LAB ══ */
+#lab{background:var(--dark);border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);}
+.lab-grid{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start;}
+.rack-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;text-align:center;}
+.rack{background:#050D18;border:2px solid rgba(0,212,255,0.18);border-top:3px solid var(--cyan);padding:8px;position:relative;box-shadow:0 0 50px rgba(0,212,255,0.05);}
+.rack-screw{position:absolute;width:6px;height:6px;background:#0A1E35;border:1px solid rgba(0,212,255,0.18);border-radius:50%;}
+.tl{top:6px;left:6px;}.tr{top:6px;right:6px;}.bl{bottom:6px;left:6px;}.br{bottom:6px;right:6px;}
+.ru{background:#09162A;border:1px solid rgba(0,212,255,0.08);margin-bottom:4px;padding:6px 10px;display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;}
+.ru::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--cyan);}
+.ru.fw::before{background:var(--gold);}
+.ru.sv::before{background:var(--green);}
+.ru.up::before{background:var(--muted);}
+.ru-u{font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--muted);width:14px;flex-shrink:0;}
+.ru-b{flex:1;}
+.ru-n{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;color:var(--white);margin-bottom:1px;}
+.ru-m{font-family:'JetBrains Mono',monospace;font-size:7px;color:var(--muted);}
+.ports{display:flex;gap:2px;margin-top:3px;flex-wrap:wrap;}
+.port{width:7px;height:5px;background:#060E1A;border:1px solid rgba(0,212,255,0.12);border-radius:1px;}
+.port.a{background:rgba(0,212,255,0.22);border-color:rgba(0,212,255,0.45);}
+.port.u{background:rgba(0,255,136,0.18);border-color:rgba(0,255,136,0.4);}
+.leds{display:flex;gap:3px;flex-shrink:0;}
+.led{width:5px;height:5px;border-radius:50%;}
+.led.g{background:var(--green);box-shadow:0 0 5px var(--green);}
+.led.a{background:var(--gold);box-shadow:0 0 5px var(--gold);}
+.led.o{background:#1A2A3A;}
+.led.bl{animation:bk 1.2s infinite;}
+.led.bl2{animation:bk .8s .4s infinite;}
+@keyframes bk{0%,100%{opacity:1;}50%{opacity:.15;}}
+
+/* Device cards */
+.dc-stack{display:flex;flex-direction:column;gap:10px;}
+.dc{background:var(--panel);border:1px solid var(--border);padding:14px 16px;position:relative;overflow:hidden;transition:border-color .3s,transform .3s;cursor:default;}
+.dc:hover{border-color:rgba(0,212,255,0.4);transform:translateX(4px);}
+.dc::after{content:'';position:absolute;top:0;left:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--cyan),var(--green));}
+.dc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
+.dc-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#fff;}
+.dc-badge{font-family:'JetBrains Mono',monospace;font-size:7.5px;padding:2px 7px;background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.22);color:var(--green);letter-spacing:.5px;}
+.dc-model{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--cyan);margin-bottom:7px;}
+.dc-specs{display:flex;flex-wrap:wrap;gap:5px;}
+.dspec{font-family:'JetBrains Mono',monospace;font-size:7.5px;padding:2px 6px;background:rgba(0,212,255,0.04);border:1px solid rgba(0,212,255,0.1);color:var(--muted);}
+
+/* ══ ABOUT ══ */
+#about{background:var(--navy);}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;}
+.atext{font-size:13.5px;line-height:1.9;color:rgba(232,244,255,0.64);}
+.atext p{margin-bottom:14px;}
+.ainfo{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.ic{background:var(--panel);border:1px solid var(--border);border-top:2px solid var(--cyan);padding:13px 14px;}
+.ic-l{font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;}
+.ic-v{font-size:11.5px;font-weight:600;color:var(--white);line-height:1.4;}
+
+/* ══ SKILLS ══ */
+#skills{background:var(--dark);border-top:1px solid var(--border2);}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.sc{background:var(--panel);border:1px solid var(--border);padding:22px;transition:border-color .3s,transform .3s;position:relative;overflow:hidden;}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--green));transform:scaleX(0);transition:transform .3s;}
+.sc:hover{border-color:rgba(0,212,255,0.35);transform:translateY(-4px);}
+.sc:hover::before{transform:scaleX(1);}
+.sc-icon{font-size:24px;margin-bottom:10px;}
+.sc-title{font-family:'Syne',sans-serif;font-size:13.5px;font-weight:700;color:#fff;margin-bottom:11px;}
+.sc-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.stag2{font-family:'JetBrains Mono',monospace;font-size:8px;padding:2px 7px;background:rgba(0,212,255,0.05);border:1px solid rgba(0,212,255,0.14);color:rgba(0,212,255,0.8);}
+
+/* ══ EXPERIENCE ══ */
+#experience{background:var(--navy);border-top:1px solid var(--border2);}
+.timeline{position:relative;padding-left:26px;}
+.timeline::before{content:'';position:absolute;left:0;top:6px;bottom:0;width:1px;background:linear-gradient(180deg,var(--cyan),transparent);}
+.tli{position:relative;margin-bottom:38px;padding-bottom:38px;border-bottom:1px solid var(--border2);}
+.tli:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.tl-dot{position:absolute;left:-32px;top:5px;width:11px;height:11px;background:var(--cyan);border-radius:50%;border:2px solid var(--navy);box-shadow:0 0 12px rgba(0,212,255,0.6);}
+.tl-date{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--cyan);letter-spacing:.8px;margin-bottom:4px;}
+.tl-title{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:#fff;margin-bottom:4px;}
+.tl-co{font-size:12px;font-weight:600;color:var(--gold);margin-bottom:3px;}
+.tl-type{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--muted);margin-bottom:12px;}
+.tl-ul{list-style:none;}
+.tl-li{font-size:12.5px;line-height:1.72;color:rgba(232,244,255,0.62);padding-left:15px;position:relative;margin-bottom:4px;}
+.tl-li::before{content:'›';position:absolute;left:0;color:var(--cyan);font-size:14px;top:-2px;font-weight:700;}
+
+/* ══ CERTS ══ */
+#certs{background:var(--dark);border-top:1px solid var(--border2);}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.cc{background:var(--panel);border:1px solid var(--border);padding:16px 18px;display:flex;gap:12px;align-items:flex-start;transition:border-color .3s,transform .3s;}
+.cc:hover{border-color:rgba(0,212,255,0.4);transform:translateX(4px);}
+.cc.cyan .ct{background:linear-gradient(135deg,var(--cyan2),var(--cyan));}
+.cc.green .ct{background:linear-gradient(135deg,#006633,var(--green));}
+.cc.gold  .ct{background:linear-gradient(135deg,#B8760A,var(--gold));}
+.ct{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--navy);flex-shrink:0;}
+.cn{font-size:12.5px;font-weight:600;color:#fff;line-height:1.4;margin-bottom:3px;}
+.cm{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--muted);}
+
+/* ══ EDUCATION ══ */
+#education{background:var(--navy);border-top:1px solid var(--border2);}
+.edu-card{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--cyan);padding:28px 32px;display:grid;grid-template-columns:1fr auto;gap:36px;align-items:center;}
+.edu-deg{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:5px;}
+.edu-uni{font-size:12.5px;font-weight:600;color:var(--cyan);margin-bottom:9px;}
+.edu-det{font-size:12px;color:var(--muted);line-height:1.7;}
+.edu-det strong{color:rgba(232,244,255,0.7);font-weight:500;}
+.edu-yr{text-align:center;background:rgba(0,212,255,0.05);border:1px solid var(--border);padding:18px 24px;}
+.ey{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;color:var(--cyan);line-height:1;margin-bottom:3px;}
+.eys{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:1px;}
+
+/* ══ CONTACT ══ */
+#contact{background:var(--dark);border-top:1px solid var(--border2);}
+.cog{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:start;}
+.co-text{font-size:13.5px;line-height:1.85;color:rgba(232,244,255,0.58);margin-bottom:24px;}
+.co-items{display:flex;flex-direction:column;gap:10px;}
+.coi{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--panel);border:1px solid var(--border);transition:border-color .2s;}
+.coi:hover{border-color:rgba(0,212,255,0.4);}
+.coi-ic{font-size:16px;width:30px;text-align:center;flex-shrink:0;}
+.coi-l{font-family:'JetBrains Mono',monospace;font-size:7.5px;color:var(--cyan);letter-spacing:1px;text-transform:uppercase;margin-bottom:2px;}
+.coi-v{font-size:12px;color:var(--white);font-weight:500;}
+
+/* Contact form */
+.cform{display:flex;flex-direction:column;gap:10px;margin-top:24px;}
+.cform input,.cform textarea{background:var(--panel);border:1px solid var(--border);color:var(--white);font-family:'Space Grotesk',sans-serif;font-size:13px;padding:11px 14px;outline:none;transition:border-color .2s;resize:none;}
+.cform input:focus,.cform textarea:focus{border-color:var(--cyan);}
+.cform textarea{height:100px;}
+.cform input::placeholder,.cform textarea::placeholder{color:var(--muted);}
+.cbtn{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:12px 24px;background:var(--cyan);color:var(--navy);border:none;cursor:pointer;transition:all .2s;align-self:flex-start;}
+.cbtn:hover{background:#fff;}
+.cmsg{font-family:'JetBrains Mono',monospace;font-size:10px;padding:8px 12px;margin-top:6px;display:none;}
+.cmsg.ok{background:rgba(0,255,136,0.08);border:1px solid rgba(0,255,136,0.3);color:var(--green);display:block;}
+.cmsg.err{background:rgba(255,68,68,0.08);border:1px solid rgba(255,68,68,0.3);color:var(--red);display:block;}
+
+/* Refs */
+.reft{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--cyan);letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+.ref-cards{display:flex;flex-direction:column;gap:10px;}
+.ref-c{background:var(--panel);border:1px solid var(--border);border-top:2px solid var(--gold);padding:14px 16px;}
+.ref-n{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:#fff;margin-bottom:2px;}
+.ref-r{font-size:10px;font-weight:600;color:var(--gold);margin-bottom:6px;line-height:1.4;}
+.ref-ct{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--muted);line-height:1.8;}
+
+/* FOOTER */
+footer{background:var(--navy);border-top:1px solid var(--border2);padding:20px 56px;display:flex;justify-content:space-between;align-items:center;}
+.fl{font-family:'Syne',sans-serif;font-size:13px;font-weight:800;color:var(--cyan);}
+.fr{font-family:'JetBrains Mono',monospace;font-size:8.5px;color:var(--muted);}
+
+@media(max-width:900px){
+  nav{padding:0 18px;}.nav-links{display:none;}
+  #hero,.wrap{padding-left:18px;padding-right:18px;}
+  .hero-inner,.about-grid,.lab-grid,.cog,.sg{grid-template-columns:1fr;}
+  .hero-topo{display:none;}.hstats{grid-template-columns:1fr 1fr;}
+  .cg{grid-template-columns:1fr;}.edu-card{grid-template-columns:1fr;}
+  footer{flex-direction:column;gap:6px;text-align:center;padding:18px;}
+}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">ZIA<span>.NET</span></div>
+  <ul class="nav-links">
+    <li><a href="#hero">Home</a></li>
+    <li><a href="#lab">Lab</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#certs">Certs</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-status"><div class="sdot"></div>{{ profile.status }}</div>
+  </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section id="hero">
+<div class="hero-inner">
+  <div>
+    <div class="hlabel">{{ profile.title }}</div>
+    <h1 class="hname">{{ profile.name.split()[0] }} {{ profile.name.split()[1] }}<br>{{ profile.name.split()[2] }} <span class="c">{{ profile.name.split()[3] }}</span></h1>
+    <div class="hcmd"><span class="g">$</span> ping career --ccna --pec={{ profile.pec }} --exp={{ profile.experience_years }}yrs</div>
+    <p class="hdesc">{{ profile.tagline }} CCNA-certified network engineer designing, deploying, and securing enterprise Cisco infrastructures.</p>
+    <div class="hbadges">
+      <span class="badge">CCNA Certified</span>
+      <span class="badge">PEC {{ profile.pec }}</span>
+      <span class="badge">Cisco IOS</span>
+      <span class="badge">{{ profile.experience_years }} Years Exp.</span>
+      <span class="badge">{{ certifications|length }} Certifications</span>
+    </div>
+    <div class="hbtns">
+      <a href="#contact" class="btn1">Hire Me</a>
+      <a href="#experience" class="btn2">View Work</a>
+    </div>
+  </div>
+
+  <!-- HERO TOPOLOGY -->
+  <div class="hero-topo">
+    <svg class="topo-svg" viewBox="0 0 460 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="gr" width="22" height="22" patternUnits="userSpaceOnUse"><path d="M22 0L0 0 0 22" fill="none" stroke="rgba(0,212,255,0.04)" stroke-width="0.5"/></pattern></defs>
+      <rect width="460" height="420" fill="url(#gr)"/>
+      <!-- Connections -->
+      <line x1="230" y1="38" x2="230" y2="86" stroke="#00D4FF" stroke-width="1.5" stroke-dasharray="5 4" opacity=".5"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1s" repeatCount="indefinite"/></line>
+      <line x1="230" y1="124" x2="230" y2="164" stroke="#F5A623" stroke-width="1.5" stroke-dasharray="5 4" opacity=".5"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.2s" repeatCount="indefinite"/></line>
+      <line x1="200" y1="198" x2="118" y2="243" stroke="#00D4FF" stroke-width="1.2" stroke-dasharray="5 4" opacity=".4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.5s" repeatCount="indefinite"/></line>
+      <line x1="260" y1="198" x2="342" y2="243" stroke="#00D4FF" stroke-width="1.2" stroke-dasharray="5 4" opacity=".4"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.7s" repeatCount="indefinite"/></line>
+      <line x1="98" y1="278" x2="58" y2="328" stroke="#00D4FF" stroke-width="1" stroke-dasharray="4 5" opacity=".3"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="2s" repeatCount="indefinite"/></line>
+      <line x1="128" y1="278" x2="158" y2="328" stroke="#00D4FF" stroke-width="1" stroke-dasharray="4 5" opacity=".3"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.8s" repeatCount="indefinite"/></line>
+      <line x1="322" y1="278" x2="282" y2="328" stroke="#00D4FF" stroke-width="1" stroke-dasharray="4 5" opacity=".3"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="2.2s" repeatCount="indefinite"/></line>
+      <line x1="354" y1="278" x2="392" y2="328" stroke="#00D4FF" stroke-width="1" stroke-dasharray="4 5" opacity=".3"><animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.9s" repeatCount="indefinite"/></line>
+      <!-- Packets -->
+      <circle r="3.5" fill="#00FF88"><animateMotion dur="1.8s" repeatCount="indefinite" path="M230,38 L230,86"/><animate attributeName="opacity" values="0;1;1;0" dur="1.8s" repeatCount="indefinite"/></circle>
+      <circle r="3" fill="#00D4FF"><animateMotion dur="2s" repeatCount="indefinite" path="M230,164 L118,243"/><animate attributeName="opacity" values="0;1;1;0" dur="2s" repeatCount="indefinite"/></circle>
+      <circle r="3" fill="#00D4FF"><animateMotion dur="2.4s" repeatCount="indefinite" path="M230,164 L342,243"/><animate attributeName="opacity" values="0;1;1;0" dur="2.4s" repeatCount="indefinite"/></circle>
+      <circle r="2.5" fill="#00FF88"><animateMotion dur="2.8s" repeatCount="indefinite" path="M98,278 L58,328"/><animate attributeName="opacity" values="0;1;0" dur="2.8s" repeatCount="indefinite"/></circle>
+      <circle r="2.5" fill="#F5A623"><animateMotion dur="3.2s" repeatCount="indefinite" path="M342,278 L392,328"/><animate attributeName="opacity" values="0;1;0" dur="3.2s" repeatCount="indefinite"/></circle>
+      <!-- Internet Cloud -->
+      <ellipse cx="230" cy="22" rx="40" ry="14" fill="#071828" stroke="#3A6A88" stroke-width="1" stroke-dasharray="3 3"/>
+      <ellipse cx="214" cy="20" rx="16" ry="10" fill="#071828" stroke="#3A6A88" stroke-width="1" stroke-dasharray="3 3"/>
+      <ellipse cx="246" cy="20" rx="16" ry="10" fill="#071828" stroke="#3A6A88" stroke-width="1" stroke-dasharray="3 3"/>
+      <text x="230" y="24" text-anchor="middle" fill="#3A6A88" font-family="JetBrains Mono" font-size="7">INTERNET</text>
+      <!-- Firewall -->
+      <rect x="192" y="86" width="76" height="38" rx="3" fill="#0A1828" stroke="#F5A623" stroke-width="1.5"/>
+      <rect x="197" y="91" width="66" height="7" rx="1" fill="#071220"/>
+      <text x="215" y="98" fill="#F5A623" font-family="JetBrains Mono" font-size="7" font-weight="600">FIREWALL</text>
+      <circle cx="254" cy="93" r="2.5" fill="#F5A623"><animate attributeName="opacity" values="1;.3;1" dur=".8s" repeatCount="indefinite"/></circle>
+      <circle cx="260" cy="93" r="2.5" fill="#00FF88"><animate attributeName="opacity" values=".3;1;.3" dur="1.2s" repeatCount="indefinite"/></circle>
+      <rect x="197" y="101" width="66" height="14" rx="1" fill="#0C1E30"/>
+      <text x="230" y="111" text-anchor="middle" fill="#5A7A99" font-family="JetBrains Mono" font-size="6.5">Cisco ASA 5506-X</text>
+      <text x="230" y="132" text-anchor="middle" fill="#F5A623" font-family="JetBrains Mono" font-size="7">FIREWALL</text>
+      <!-- Core Router -->
+      <rect x="183" y="164" width="94" height="40" rx="3" fill="#0A1828" stroke="#00D4FF" stroke-width="1.8"/>
+      <rect x="189" y="169" width="82" height="9" rx="1" fill="#071220"/>
+      {% for i in range(6) %}<rect x="{{ 191 + i*12 }}" y="171" width="9" height="5" rx=".5" fill="#071220" stroke="rgba(0,212,255,.5)" stroke-width=".8"/>{% endfor %}
+      <circle cx="262" cy="173" r="2" fill="#00FF88"><animate attributeName="opacity" values="1;.2;1" dur="1.5s" repeatCount="indefinite"/></circle>
+      <rect x="189" y="182" width="82" height="14" rx="1" fill="#0C1E30"/>
+      <text x="230" y="193" text-anchor="middle" fill="#00D4FF" font-family="JetBrains Mono" font-size="7" letter-spacing="1">CORE ROUTER</text>
+      <text x="230" y="202" text-anchor="middle" fill="#3A6A88" font-family="JetBrains Mono" font-size="6">Cisco 4321 · OSPF · BGP</text>
+      <circle cx="230" cy="184" r="50" fill="none" stroke="#00D4FF" stroke-width=".5" opacity=".07"><animate attributeName="r" values="40;56;40" dur="3s" repeatCount="indefinite"/></circle>
+      <!-- L3 Switches -->
+      <rect x="74" y="243" width="78" height="36" rx="3" fill="#0A1828" stroke="#00D4FF" stroke-width="1.3"/>
+      <rect x="79" y="248" width="68" height="7" rx="1" fill="#071220"/>
+      {% for i in range(6) %}<rect x="{{ 81 + i*10 }}" y="250" width="6" height="3" rx=".5" fill="#071220" stroke="#00D4FF" stroke-width=".5" opacity="{{ 0.4 + i*0.1 }}"/>{% endfor %}
+      <rect x="79" y="259" width="68" height="12" rx="1" fill="#0C1E30"/>
+      <text x="113" y="269" text-anchor="middle" fill="#00D4FF" font-family="JetBrains Mono" font-size="7">L3-SW-01</text>
+      <text x="113" y="288" text-anchor="middle" fill="#3A6A88" font-family="JetBrains Mono" font-size="6">Catalyst 3750</text>
+      <rect x="308" y="243" width="78" height="36" rx="3" fill="#0A1828" stroke="#00D4FF" stroke-width="1.3"/>
+      <rect x="313" y="248" width="68" height="7" rx="1" fill="#071220"/>
+      {% for i in range(6) %}<rect x="{{ 315 + i*10 }}" y="250" width="6" height="3" rx=".5" fill="#071220" stroke="#00D4FF" stroke-width=".5" opacity="{{ 0.4 + i*0.1 }}"/>{% endfor %}
+      <rect x="313" y="259" width="68" height="12" rx="1" fill="#0C1E30"/>
+      <text x="347" y="269" text-anchor="middle" fill="#00D4FF" font-family="JetBrains Mono" font-size="7">L3-SW-02</text>
+      <text x="347" y="288" text-anchor="middle" fill="#3A6A88" font-family="JetBrains Mono" font-size="6">Catalyst 3750</text>
+      <!-- Access Switches -->
+      <rect x="26" y="328" width="52" height="26" rx="2" fill="#0A1828" stroke="#5A7A99" stroke-width="1"/>
+      <text x="52" y="345" text-anchor="middle" fill="#3A6A88" font-family="JetBrains Mono" font-size="6">ACC-SW1</text>
+      <rect x="132" y="328" width="52" height="26" rx="2" fill="#0A1828" stroke="#5A7A99" stroke-width="1"/>
+      <text x="158" y="345" text-anchor="middle" fill="#3A6A88" font-family="JetBrains Mono" font-size="6">ACC-SW2</text>
+      <rect x="254" y="328" width="52" height="26" rx="2" fill="#0A1828" stroke="#5A7A99" stroke-width="1"/>
+      <text x="280" y="345" text-anchor="middle" fill="#3A6A88" font-family="JetBrains Mono" font-size="6">ACC-SW3</text>
+      <rect x="364" y="328" width="52" height="26" rx="2" fill="#0A1828" stroke="#5A7A99" stroke-width="1"/>
+      <text x="390" y="345" text-anchor="middle" fill="#3A6A88" font-family="JetBrains Mono" font-size="6">ACC-SW4</text>
+      <!-- VLAN labels -->
+      <text x="52" y="318" text-anchor="middle" fill="#00D4FF" font-family="JetBrains Mono" font-size="6.5" opacity=".5">VLAN 10</text>
+      <text x="158" y="318" text-anchor="middle" fill="#00FF88" font-family="JetBrains Mono" font-size="6.5" opacity=".5">VLAN 20</text>
+      <text x="280" y="318" text-anchor="middle" fill="#00D4FF" font-family="JetBrains Mono" font-size="6.5" opacity=".5">VLAN 30</text>
+      <text x="390" y="318" text-anchor="middle" fill="#F5A623" font-family="JetBrains Mono" font-size="6.5" opacity=".5">VLAN 40</text>
+      <!-- End devices icons -->
+      <rect x="30" y="362" width="18" height="12" rx="1" fill="#071220" stroke="#3A6A88" stroke-width=".6"/>
+      <rect x="62" y="362" width="18" height="12" rx="1" fill="#071220" stroke="#3A6A88" stroke-width=".6"/>
+      <rect x="136" y="360" width="18" height="16" rx="1" fill="#071220" stroke="#00FF88" stroke-width=".8"/>
+      <circle cx="149" cy="365" r="1.5" fill="#00FF88" opacity=".8"/>
+      <text x="149" y="382" text-anchor="middle" fill="#00FF88" font-family="JetBrains Mono" font-size="5">SRV</text>
+      <ellipse cx="270" cy="370" rx="12" ry="4" fill="none" stroke="#00D4FF" stroke-width=".8" opacity=".6"/>
+      <circle cx="270" cy="370" r="3" fill="#00D4FF"/>
+      <text x="270" y="385" text-anchor="middle" fill="#3A6A88" font-family="JetBrains Mono" font-size="5">WiFi</text>
+      <rect x="368" y="361" width="16" height="15" rx="1" fill="#071220" stroke="#F5A623" stroke-width=".7"/>
+      <text x="376" y="382" text-anchor="middle" fill="#F5A623" font-family="JetBrains Mono" font-size="5">PRNT</text>
+    </svg>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="hstats" style="margin:36px 56px 0;max-width:1200px;">
+  {% for s in stats %}
+  <div class="hstat"><div class="hstat-n">{{ s.num }}</div><div class="hstat-l">{{ s.label }}</div></div>
+  {% endfor %}
+</div>
+</section>
+
+<!-- ══ NETWORK LAB ══ -->
+<section id="lab">
+<div class="wrap">
+  <div class="stag rv">Data Center</div>
+  <h2 class="stitle rv">Network <span>Lab</span></h2>
+  <div class="lab-grid">
+
+    <!-- Rack -->
+    <div class="rv">
+      <div class="rack-label">// Enterprise Server Rack — 19" 42U</div>
+      <div class="rack">
+        <div class="rack-screw tl"></div><div class="rack-screw tr"></div>
+        <div class="rack-screw bl"></div><div class="rack-screw br"></div>
+        {% for d in rack_devices %}
+        <div class="ru {% if 'Firewall' in d.name %}fw{% elif 'Server' in d.name %}sv{% elif 'UPS' in d.name %}up{% endif %}">
+          <div class="ru-u">{{ d.unit }}</div>
+          <div class="ru-b">
+            <div class="ru-n">{{ d.name }}</div>
+            <div class="ru-m">{{ d.model }}</div>
+            <div class="ports">
+              {% for j in range(8) %}<div class="port {% if j < 4 %}u{% elif j < 6 %}a{% endif %}"></div>{% endfor %}
+            </div>
+          </div>
+          <div class="leds">
+            {% for led in d.leds %}
+            <div class="led {% if led == 'green' %}g {% if loop.index == 1 %}bl{% else %}bl2{% endif %}{% elif led == 'amber' %}a bl{% elif led == 'off' %}o{% endif %}"></div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Device Cards -->
+    <div class="dc-stack rv">
+      <div class="dc"><div class="dc-top"><div class="dc-name">🌐 Core Router</div><div class="dc-badge">● ONLINE</div></div><div class="dc-model">Cisco ISR 4321 / Catalyst 4321</div><div class="dc-specs"><span class="dspec">OSPF</span><span class="dspec">BGP</span><span class="dspec">EIGRP</span><span class="dspec">NAT/PAT</span><span class="dspec">VPN</span><span class="dspec">QoS</span></div></div>
+      <div class="dc"><div class="dc-top"><div class="dc-name">🔒 Cisco ASA Firewall</div><div class="dc-badge">● ACTIVE</div></div><div class="dc-model">ASA 5506-X with FirePOWER FTD</div><div class="dc-specs"><span class="dspec">IPS/IDS</span><span class="dspec">ACL</span><span class="dspec">VPN</span><span class="dspec">NAT</span><span class="dspec">Threat Defense</span></div></div>
+      <div class="dc"><div class="dc-top"><div class="dc-name">🔀 L3 Core Switch</div><div class="dc-badge">● ONLINE</div></div><div class="dc-model">Cisco Catalyst 3750G Series</div><div class="dc-specs"><span class="dspec">VLAN 10–40</span><span class="dspec">STP</span><span class="dspec">RSTP</span><span class="dspec">Inter-VLAN</span><span class="dspec">LACP</span></div></div>
+      <div class="dc"><div class="dc-top"><div class="dc-name">📡 Wi-Fi Controller</div><div class="dc-badge">● ONLINE</div></div><div class="dc-model">Cisco Aironet 2800 Series AP</div><div class="dc-specs"><span class="dspec">802.11ac</span><span class="dspec">PoE</span><span class="dspec">WPA3</span><span class="dspec">SSID Segmentation</span></div></div>
+      <div class="dc"><div class="dc-top"><div class="dc-name">🖥️ Primary Server</div><div class="dc-badge">● RUNNING</div></div><div class="dc-model">Dell PowerEdge R740</div><div class="dc-specs"><span class="dspec">Active Directory</span><span class="dspec">DNS</span><span class="dspec">DHCP</span><span class="dspec">RAID 6</span></div></div>
+      <div class="dc"><div class="dc-top"><div class="dc-name">📊 Monitoring Stack</div><div class="dc-badge">● WATCHING</div></div><div class="dc-model">Python · Bash · Wireshark · Nmap</div><div class="dc-specs"><span class="dspec">Syslog</span><span class="dspec">SNMP</span><span class="dspec">Netflow</span><span class="dspec">Automation</span></div></div>
+    </div>
+
+  </div>
+</div>
+</section>
+
+<!-- ══ ABOUT ══ -->
+<section id="about">
+<div class="wrap">
+  <div class="stag rv">About</div>
+  <h2 class="stitle rv">Who I <span>Am</span></h2>
+  <div class="about-grid">
+    <div class="atext rv">
+      {% for para in profile.about %}<p>{{ para|safe }}</p>{% endfor %}
+    </div>
+    <div class="ainfo rv">
+      <div class="ic"><div class="ic-l">Full Name</div><div class="ic-v">{{ profile.name }}</div></div>
+      <div class="ic"><div class="ic-l">Location</div><div class="ic-v">{{ profile.location }}</div></div>
+      <div class="ic"><div class="ic-l">PEC No.</div><div class="ic-v">{{ profile.pec }}</div></div>
+      <div class="ic"><div class="ic-l">Certification</div><div class="ic-v">CCNA — Cisco Academy</div></div>
+      <div class="ic"><div class="ic-l">Experience</div><div class="ic-v">{{ profile.experience_years }} Years Enterprise</div></div>
+      <div class="ic"><div class="ic-l">Status</div><div class="ic-v" style="color:var(--green)">● {{ profile.status }}</div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══ SKILLS ══ -->
+<section id="skills">
+<div class="wrap">
+  <div class="stag rv">Technical Expertise</div>
+  <h2 class="stitle rv">Core <span>Skills</span></h2>
+  <div class="sg">
+    {% for s in skills %}
+    <div class="sc rv">
+      <div class="sc-icon">{{ s.icon }}</div>
+      <div class="sc-title">{{ s.title }}</div>
+      <div class="sc-tags">{% for t in s.tags %}<span class="stag2">{{ t }}</span>{% endfor %}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+</section>
+
+<!-- ══ EXPERIENCE ══ -->
+<section id="experience">
+<div class="wrap">
+  <div class="stag rv">Career History</div>
+  <h2 class="stitle rv">Work <span>Experience</span></h2>
+  <div class="timeline">
+    {% for job in experience %}
+    <div class="tli rv">
+      <div class="tl-dot"></div>
+      <div class="tl-date">{{ job.period }}</div>
+      <div class="tl-title">{{ job.title }}</div>
+      <div class="tl-co">{{ job.company }}</div>
+      <div class="tl-type">{{ job.location }} &nbsp;·&nbsp; {{ job.type }}</div>
+      <ul class="tl-ul">
+        {% for b in job.bullets %}<li class="tl-li">{{ b }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+</section>
+
+<!-- ══ CERTIFICATIONS ══ -->
+<section id="certs">
+<div class="wrap">
+  <div class="stag rv">Credentials</div>
+  <h2 class="stitle rv">Certifications</h2>
+  <div class="cg">
+    {% for c in certifications %}
+    <div class="cc {{ c.color }} rv">
+      <div class="ct">✓</div>
+      <div><div class="cn">{{ c.name }}</div><div class="cm">{{ c.issuer }} &nbsp;·&nbsp; {{ c.date }}</div></div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+</section>
+
+<!-- ══ EDUCATION ══ -->
+<section id="education">
+<div class="wrap">
+  <div class="stag rv">Academic Background</div>
+  <h2 class="stitle rv">Education</h2>
+  <div class="edu-card rv">
+    <div>
+      <div class="edu-deg">{{ education.degree }}</div>
+      <div class="edu-uni">{{ education.university }} · {{ education.location }}</div>
+      <div class="edu-det">
+        <strong>Major:</strong> {{ education.major }} &nbsp;·&nbsp;
+        <strong>PEC:</strong> {{ education.pec }}<br>
+        <strong>Thesis:</strong> {{ education.thesis }}
+      </div>
+    </div>
+    <div class="edu-yr">
+      <div class="ey">{{ education.period.split('—')[0].strip() }}</div>
+      <div class="eys" style="margin:3px 0">——</div>
+      <div class="ey">{{ education.period.split('—')[1].strip() }}</div>
+      <div class="eys" style="margin-top:6px">B.SC ENG.</div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ══ CONTACT ══ -->
+<section id="contact">
+<div class="wrap">
+  <div class="stag rv">Get In Touch</div>
+  <h2 class="stitle rv">Contact <span>&amp; References</span></h2>
+  <div class="cog">
+    <div>
+      <p class="co-text">Available for Network Engineer roles, freelance projects, and consultations. Reach out anytime.</p>
+      <div class="co-items rv">
+        <div class="coi"><div class="coi-ic">📍</div><div><div class="coi-l">Location</div><div class="coi-v">{{ profile.location }}</div></div></div>
+        <div class="coi"><div class="coi-ic">📞</div><div><div class="coi-l">Phone</div><div class="coi-v">{{ profile.phone | join(' / ') }}</div></div></div>
+        <div class="coi"><div class="coi-ic">✉️</div><div><div class="coi-l">Email</div><div class="coi-v">{{ profile.email }}</div></div></div>
+        <div class="coi"><div class="coi-ic">💼</div><div><div class="coi-l">LinkedIn</div><div class="coi-v">{{ profile.linkedin }}</div></div></div>
+      </div>
+      <!-- Contact Form -->
+      <div class="cform rv" style="margin-top:20px;">
+        <input type="text" id="cf-name" placeholder="Your Name" autocomplete="off">
+        <input type="email" id="cf-email" placeholder="Your Email" autocomplete="off">
+        <textarea id="cf-msg" placeholder="Your Message"></textarea>
+        <button class="cbtn" onclick="sendMsg()">Send Message</button>
+        <div class="cmsg" id="cf-resp"></div>
+      </div>
+    </div>
+    <div class="rv">
+      <div class="reft">// References</div>
+      <div class="ref-cards">
+        {% for r in references %}
+        <div class="ref-c">
+          <div class="ref-n">{{ r.name }}</div>
+          <div class="ref-r">{{ r.role }} — {{ r.company }}</div>
+          <div class="ref-ct">
+            {{ r.email }}<br>{{ r.phone }}
+            {% if r.website %}<br>{{ r.website }}{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>
+  <div class="fl">ZIA.NET — {{ profile.pec }}</div>
+  <div class="fr">© {{ year }} {{ profile.name }} · Network & IT Infrastructure Engineer · Azad Kashmir, Pakistan</div>
+</footer>
+
+<script>
+// ── BACKGROUND CANVAS ──
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resize(); window.addEventListener('resize', resize);
+
+const nodes = Array.from({length:30}, () => ({
+  x: Math.random() * window.innerWidth,
+  y: Math.random() * window.innerHeight,
+  vx: (Math.random()-.5)*.28,
+  vy: (Math.random()-.5)*.28,
+  r: Math.random()*2+1,
+  type: Math.random()>.6 ? (Math.random()>.5 ? 'router':'switch') : 'node'
+}));
+
+function drawRouter(x,y,s,a){
+  ctx.save(); ctx.globalAlpha=a; ctx.strokeStyle='#00D4FF'; ctx.lineWidth=.8;
+  ctx.strokeRect(x-s, y-s*.6, s*2, s*1.2);
+  ctx.strokeStyle='rgba(0,212,255,.3)'; ctx.lineWidth=.4;
+  for(let i=0;i<2;i++){ctx.beginPath();ctx.moveTo(x-s+2, y-s*.3+i*4);ctx.lineTo(x+s-2, y-s*.3+i*4);ctx.stroke();}
+  ctx.restore();
+}
+function drawSwitch(x,y,s,a){
+  ctx.save(); ctx.globalAlpha=a; ctx.strokeStyle='#00FF88'; ctx.lineWidth=.7;
+  ctx.strokeRect(x-s*1.3, y-s*.4, s*2.6, s*.8);
+  for(let i=0;i<4;i++){ ctx.fillStyle='rgba(0,255,136,.25)'; ctx.fillRect(x-s*1.1+i*s*.55, y-s*.2, s*.4, s*.35); }
+  ctx.restore();
+}
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  for(let i=0;i<nodes.length;i++){
+    for(let j=i+1;j<nodes.length;j++){
+      const dx=nodes[i].x-nodes[j].x, dy=nodes[i].y-nodes[j].y, d=Math.sqrt(dx*dx+dy*dy);
+      if(d<185){
+        ctx.strokeStyle=`rgba(0,212,255,${(1-d/185)*.09})`; ctx.lineWidth=.5; ctx.setLineDash([5,7]);
+        ctx.beginPath(); ctx.moveTo(nodes[i].x,nodes[i].y); ctx.lineTo(nodes[j].x,nodes[j].y); ctx.stroke(); ctx.setLineDash([]);
+      }
+    }
+  }
+  nodes.forEach(n=>{
+    if(n.type==='router') drawRouter(n.x,n.y,9,.28);
+    else if(n.type==='switch') drawSwitch(n.x,n.y,8,.22);
+    else { ctx.beginPath(); ctx.arc(n.x,n.y,n.r,0,Math.PI*2); ctx.fillStyle='rgba(0,212,255,.42)'; ctx.fill(); }
+    n.x+=n.vx; n.y+=n.vy;
+    if(n.x<0||n.x>canvas.width) n.vx*=-1;
+    if(n.y<0||n.y>canvas.height) n.vy*=-1;
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+// ── SCROLL REVEAL ──
+const obs = new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('on');}),{threshold:.08});
+document.querySelectorAll('.rv').forEach(r=>obs.observe(r));
+
+// ── CONTACT FORM ──
+async function sendMsg(){
+  const name  = document.getElementById('cf-name').value.trim();
+  const email = document.getElementById('cf-email').value.trim();
+  const msg   = document.getElementById('cf-msg').value.trim();
+  const resp  = document.getElementById('cf-resp');
+  resp.className='cmsg'; resp.textContent='';
+  try {
+    const res = await fetch('/api/contact',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,message:msg})});
+    const data = await res.json();
+    if(data.success){ resp.className='cmsg ok'; resp.textContent='✓ '+data.message; document.getElementById('cf-name').value=''; document.getElementById('cf-email').value=''; document.getElementById('cf-msg').value=''; }
+    else { resp.className='cmsg err'; resp.textContent='✗ '+data.error; }
+  } catch(e){ resp.className='cmsg err'; resp.textContent='✗ Connection error. Please try again.'; }
+}
+</script>
+</body>
+</html>
+
+from flask import Flask, render_template, jsonify, request
+from datetime import datetime
+
+app = Flask(__name__)
+
+# ── DATA ──────────────────────────────────────────────────────────────
+PROFILE = {
+    "name": "Zia Ur Rehman Tariq",
+    "title": "Network & IT Infrastructure Engineer",
+    "tagline": "Building networks that don't go down.",
+    "location": "Poonch, Azad Kashmir, Pakistan",
+    "phone": ["+92-312-9691166", "+92-355-8340150"],
+    "email": "ziayahoo101@gmail.com",
+    "linkedin": "linkedin.com/in/ziaminhas",
+    "pec": "COMP/025388",
+    "experience_years": "3+",
+    "status": "Available for Hire",
+    "about": [
+        "I'm a <strong>CCNA-certified Network & IT Infrastructure Engineer</strong> based in Azad Kashmir, Pakistan, with over 3 years of progressive hands-on experience designing, deploying, and securing Cisco-based enterprise networks.",
+        "I specialize in <strong>routing & switching, VLAN segmentation, OSPF dynamic routing, firewall configuration, and LAN/WAN management</strong> — backed by Python and Bash automation skills that keep networks running efficiently.",
+        "As a <strong>PEC-registered engineer</strong> (COMP/025388), I hold 8 Cisco Academy certifications across networking, cybersecurity, ethical hacking, endpoint security, and automation tracks.",
+        "If the network is down, nothing works — and I make sure that doesn't happen."
+    ]
+}
+
+STATS = [
+    {"num": "3+",  "label": "Years Experience"},
+    {"num": "8",   "label": "Certifications"},
+    {"num": "3",   "label": "Companies"},
+    {"num": "CCNA","label": "Cisco Certified"},
+]
+
+SKILLS = [
+    {
+        "icon": "🌐", "title": "Routing & Switching",
+        "tags": ["Cisco IOS","OSPF","EIGRP","BGP","STP/RSTP","VTP","Inter-VLAN","Route Redistribution"]
+    },
+    {
+        "icon": "🔒", "title": "Network Security",
+        "tags": ["Firewall Config","ACLs","VPN","IDS/IPS","Ethical Hacking","Pentest","Endpoint Security","Threat Mgmt"]
+    },
+    {
+        "icon": "🖧",  "title": "Infrastructure",
+        "tags": ["LAN/WAN","VLAN","Wi-Fi Deploy","IPv4/IPv6","DHCP/DNS","NAT/PAT","Structured Cabling","PoE"]
+    },
+    {
+        "icon": "⚙️", "title": "Automation & Scripting",
+        "tags": ["Python","Bash","Network Automation","Config Management","Monitoring Scripts","Task Scheduling"]
+    },
+    {
+        "icon": "🖥️", "title": "Systems Administration",
+        "tags": ["Linux CLI","Windows Server","Active Directory","Troubleshooting","Syslog","SNMP","Remote Access"]
+    },
+    {
+        "icon": "🛠️", "title": "Tools & Platforms",
+        "tags": ["Cisco Packet Tracer","Wireshark","GNS3","Nmap","PuTTY","SecureCRT","Netflow Analyzer"]
+    },
+]
+
+EXPERIENCE = [
+    {
+        "title": "Network Administrator",
+        "company": "CODHUNT Tech Solutions",
+        "location": "Rawalpindi, Pakistan",
+        "period": "December 2022 — April 2024",
+        "type": "Full Time",
+        "bullets": [
+            "Designed and deployed scalable, enterprise-grade Cisco network infrastructure from scratch, supporting full business operations across the organisation.",
+            "Configured and maintained Cisco ASA firewall systems to monitor, filter, and protect all inbound and outbound enterprise network traffic against threats.",
+            "Implemented VLAN segmentation strategies and OSPF dynamic routing protocols, significantly improving network efficiency and security posture.",
+            "Managed and optimised LAN/WAN connectivity, maintaining consistent high availability and peak network performance at all times.",
+            "Developed Python and Bash automation scripts for routine network configuration, monitoring, and reporting tasks — reducing manual effort considerably.",
+            "Performed proactive 24/7 network health monitoring and rapid root-cause analysis, minimising critical downtime and ensuring business continuity.",
+            "Maintained comprehensive documentation of network topologies, configurations, and SOPs for team knowledge and future scaling.",
+        ]
+    },
+    {
+        "title": "IT Infrastructure Intern",
+        "company": "Evolution Contractor's",
+        "location": "Rahim Yar Khan, Pakistan",
+        "period": "July 2024 — June 2025",
+        "type": "HEC Internship · Ref: C1/1525",
+        "bullets": [
+            "Led complete end-to-end IT infrastructure deployment for a large-scale newly constructed commercial building under the national HEC Internship Program.",
+            "Designed and configured structured LAN cabling and enterprise Wi-Fi networks throughout the entire building using Cisco equipment and best practices.",
+            "Installed and commissioned all network devices including managed switches, wireless access points, routers, and end-user workstations across all floors.",
+            "Implemented the building-wide IP addressing scheme, VLAN structure, and system configurations.",
+            "Delivered reliable on-site technical support, ensuring zero critical outages during go-live and formal project handover phases.",
+            "Monitored system health, performed preventive maintenance, and produced regular IT performance reports for management.",
+        ]
+    },
+    {
+        "title": "Network Engineering Intern",
+        "company": "Climaxcode Technology (Pvt) Ltd",
+        "location": "Shamsabad, Rawalpindi, Pakistan",
+        "period": "September 2021 — November 2021",
+        "type": "Internship",
+        "bullets": [
+            "Assisted senior network engineers with Cisco network configuration, device setup, and systems administration tasks.",
+            "Supported fault diagnosis, troubleshooting, and preventive maintenance of enterprise IT infrastructure.",
+            "Participated in live client networking projects under professional supervision — Systems Administration Department.",
+            "Recognised by management as punctual, hardworking, and highly professional throughout the programme.",
+        ]
+    },
+]
+
+CERTIFICATIONS = [
+    {"name": "CCNA: Introduction to Networks",                        "issuer": "Cisco Networking Academy", "date": "Oct 2024", "color": "cyan"},
+    {"name": "CCNA: Switching, Routing & Wireless Essentials",        "issuer": "Cisco Networking Academy", "date": "Jan 2025", "color": "cyan"},
+    {"name": "CCNA: Enterprise Networking, Security & Automation",    "issuer": "Cisco Networking Academy", "date": "Aug 2025", "color": "cyan"},
+    {"name": "Introduction to Cybersecurity",                         "issuer": "Cisco Networking Academy", "date": "Jun 2024", "color": "green"},
+    {"name": "Cyber Threat Management",                               "issuer": "Cisco Networking Academy", "date": "Jul 2024", "color": "green"},
+    {"name": "Ethical Hacker",                                        "issuer": "Cisco Networking Academy", "date": "Jul 2024", "color": "green"},
+    {"name": "Endpoint Security",                                     "issuer": "Cisco Networking Academy", "date": "Sep 2024", "color": "green"},
+    {"name": "CyberSavvy: Linux & Essential CyberSecurity",           "issuer": "UrduCourses",              "date": "Feb 2026", "color": "gold"},
+]
+
+EDUCATION = {
+    "degree": "Bachelor of Science in Computer Systems Engineering",
+    "university": "Mirpur University of Science and Technology (MUST)",
+    "location": "Mirpur, Azad Kashmir",
+    "period": "2017 — 2021",
+    "major": "Networking",
+    "pec": "COMP/025388",
+    "thesis": "IoT-Based Smart Hospital Monitoring System",
+}
+
+REFERENCES = [
+    {
+        "name": "Fakhar Ali",
+        "role": "CEO & Founder",
+        "company": "CODHUNT Tech Solutions, Rawalpindi",
+        "email": "admin@codhunt.com",
+        "phone": "+92-340-8901353",
+        "website": "www.codhunt.com",
+    },
+    {
+        "name": "Maira Sarfraz",
+        "role": "Human Resource Executive",
+        "company": "Climaxcode Technology (Pvt) Ltd",
+        "email": "info@climaxcode.com",
+        "phone": "051-8913384 / 0316-9206209",
+        "website": None,
+    },
+]
+
+RACK_DEVICES = [
+    {"unit": "1U",  "name": "Patch Panel — CAT6A 24-Port",           "model": "Keystone · 110 Block",                "type": "patch",    "leds": ["off","green"]},
+    {"unit": "2U",  "name": "Cisco ISR 4321 Router",                  "model": "IOS XE · OSPF · BGP · NAT · QoS",    "type": "router",   "leds": ["green","green","amber"]},
+    {"unit": "3U",  "name": "Cisco ASA 5506-X Firewall",              "model": "FirePOWER · IPS · VPN · ACL",         "type": "firewall", "leds": ["amber","green"]},
+    {"unit": "4U",  "name": "Cisco Catalyst 3750G — Core Switch",     "model": "48-Port L3 · OSPF · VLAN Trunking",  "type": "switch",   "leds": ["green","green","green"]},
+    {"unit": "5U",  "name": "Cisco Catalyst 2960-X — Access Switch",  "model": "24-Port PoE · VLAN Segmented",        "type": "switch",   "leds": ["green","green"]},
+    {"unit": "6U",  "name": "Dell PowerEdge R740 — Primary Server",   "model": "Xeon Gold · 64GB RAM · 4TB RAID 6",  "type": "server",   "leds": ["green","green","off"]},
+    {"unit": "7U",  "name": "Dell PowerEdge R640 — Backup Server",    "model": "Xeon Silver · 32GB RAM · DNS/DHCP",  "type": "server",   "leds": ["green","amber"]},
+    {"unit": "8U",  "name": "APC Smart-UPS 2200VA",                   "model": "Uninterruptible Power Supply",        "type": "ups",      "leds": ["green","off"]},
+]
+
+# ── ROUTES ────────────────────────────────────────────────────────────
+@app.route("/")
+def index():
+    return render_template("index.html",
+        profile=PROFILE, stats=STATS, skills=SKILLS,
+        experience=EXPERIENCE, certifications=CERTIFICATIONS,
+        education=EDUCATION, references=REFERENCES,
+        rack_devices=RACK_DEVICES, year=datetime.now().year
+    )
+
+# ── API ENDPOINTS ─────────────────────────────────────────────────────
+@app.route("/api/profile")
+def api_profile():
+    return jsonify(PROFILE)
+
+@app.route("/api/skills")
+def api_skills():
+    return jsonify(SKILLS)
+
+@app.route("/api/experience")
+def api_experience():
+    return jsonify(EXPERIENCE)
+
+@app.route("/api/certifications")
+def api_certifications():
+    return jsonify(CERTIFICATIONS)
+
+@app.route("/api/stats")
+def api_stats():
+    return jsonify(STATS)
+
+@app.route("/api/rack")
+def api_rack():
+    return jsonify(RACK_DEVICES)
+
+@app.route("/api/contact", methods=["POST"])
+def api_contact():
+    data = request.json or {}
+    name    = data.get("name", "").strip()
+    email   = data.get("email", "").strip()
+    message = data.get("message", "").strip()
+    if not name or not email or not message:
+        return jsonify({"success": False, "error": "All fields are required."}), 400
+    # In production: send email / save to DB
+    return jsonify({"success": True, "message": f"Thanks {name}! Message received."})
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
